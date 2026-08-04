@@ -6,11 +6,18 @@
     </x-slot>
 
     <div class="py-12">
+        <div class="max-w-5xl mx-auto sm:px-6 lg:px-8 grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <x-stat-tile :label="__('Published')" :value="$stats['published']" dot="#0ca30c" />
+            <x-stat-tile :label="__('Pending Approval')" :value="$stats['pending']" dot="#fab219" />
+            <x-stat-tile :label="__('Authors')" :value="$stats['authors']" dot="#2a78d6" />
+            <x-stat-tile :label="__('Active Categories')" :value="$stats['categories']" dot="#4a3aa7" />
+        </div>
+
         <div class="max-w-5xl mx-auto sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div class="bg-white shadow-sm sm:rounded-lg p-6">
-                <h3 class="font-semibold text-gray-800 mb-4">{{ __('Published Articles by Author') }}</h3>
-                @if ($authorCounts->isNotEmpty())
-                    <canvas id="byAuthorChart" height="220"></canvas>
+                <h3 class="font-semibold text-gray-800 mb-4">{{ __('Published Articles by Category, by Author') }}</h3>
+                @if ($categoryLabels->isNotEmpty())
+                    <canvas id="byCategoryAuthorChart" height="220"></canvas>
                 @else
                     <p class="text-sm text-gray-500">{{ __('No published articles yet.') }}</p>
                 @endif
@@ -27,7 +34,7 @@
         </div>
     </div>
 
-    @if ($authorCounts->isNotEmpty() || $statusCounts->sum() > 0)
+    @if ($categoryLabels->isNotEmpty() || $statusCounts->sum() > 0)
         <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
         <script>
             const mutedInk = '#898781';
@@ -37,24 +44,26 @@
             Chart.defaults.font.family = 'system-ui, -apple-system, "Segoe UI", sans-serif';
             Chart.defaults.color = mutedInk;
 
-            @if ($authorCounts->isNotEmpty())
-                new Chart(document.getElementById('byAuthorChart'), {
+            @if ($categoryLabels->isNotEmpty())
+                new Chart(document.getElementById('byCategoryAuthorChart'), {
                     type: 'bar',
                     data: {
-                        labels: {!! json_encode($authorLabels) !!},
-                        datasets: [{
-                            label: 'Published',
-                            data: {!! json_encode($authorCounts) !!},
-                            backgroundColor: '#2a78d6',
-                            borderRadius: 4,
-                            maxBarThickness: 24,
-                        }],
+                        labels: {!! json_encode($categoryLabels) !!},
+                        datasets: {!! $authorSeries->map(fn ($s) => [
+                            'label' => $s['label'],
+                            'data' => $s['data'],
+                            'backgroundColor' => $s['color'],
+                            'borderColor' => '#ffffff',
+                            'borderWidth' => 2,
+                        ])->values()->toJson() !!},
                     },
                     options: {
-                        plugins: { legend: { display: false } },
+                        plugins: {
+                            legend: { position: 'bottom', labels: { color: primaryInk } },
+                        },
                         scales: {
-                            x: { grid: { display: false }, ticks: { color: primaryInk } },
-                            y: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: gridline } },
+                            x: { stacked: true, grid: { display: false }, ticks: { color: primaryInk } },
+                            y: { stacked: true, beginAtZero: true, ticks: { precision: 0 }, grid: { color: gridline } },
                         },
                     },
                 });

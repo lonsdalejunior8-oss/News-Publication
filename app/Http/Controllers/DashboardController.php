@@ -30,6 +30,12 @@ class DashboardController extends Controller
             'statusCounts' => $byStatus->values(),
             'categoryLabels' => $byCategory->keys(),
             'categoryCounts' => $byCategory->values(),
+            'stats' => [
+                'total' => $articles->count(),
+                'draft' => $byStatus['draft'],
+                'pending' => $byStatus['pending'],
+                'published' => $byStatus['published'],
+            ],
         ]);
     }
 }

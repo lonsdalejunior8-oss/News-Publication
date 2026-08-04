@@ -4,7 +4,7 @@
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 {{ __('My Articles') }}
             </h2>
-            <a href="{{ route('articles.create') }}" class="inline-flex items-center px-4 py-2 bg-gray-800 text-white rounded-md text-sm font-medium hover:bg-gray-700">
+            <a href="{{ route('articles.create') }}" class="inline-flex items-center px-4 py-2 bg-sig-blue text-white rounded-md text-sm font-medium hover:bg-sig-blue-dark">
                 {{ __('New Article') }}
             </a>
         </div>
@@ -13,10 +13,15 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
             @if (session('status'))
-                <div class="p-4 bg-green-50 border border-green-200 rounded text-sm text-green-700">
-                    {{ session('status') }}
-                </div>
+                <x-flash-message>{{ session('status') }}</x-flash-message>
             @endif
+
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <x-stat-tile :label="__('Total Articles')" :value="$stats['total']" dot="#2a78d6" />
+                <x-stat-tile :label="__('Draft')" :value="$stats['draft']" dot="#c3c2b7" />
+                <x-stat-tile :label="__('Pending')" :value="$stats['pending']" dot="#fab219" />
+                <x-stat-tile :label="__('Published')" :value="$stats['published']" dot="#0ca30c" />
+            </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div class="bg-white shadow-sm sm:rounded-lg p-6">
@@ -45,22 +50,42 @@
                     </div>
                     <ul class="divide-y">
                         @foreach ($articles as $article)
-                            <li class="px-6 py-4 flex items-center justify-between">
-                                <div>
-                                    <a href="{{ route('articles.edit', $article) }}" class="font-medium text-gray-900 hover:underline">
+                            <li class="px-6 py-4 flex items-center justify-between gap-4 transition hover:bg-gray-50">
+                                <a href="{{ route('articles.edit', $article) }}" class="min-w-0 flex-1 group">
+                                    <div class="font-medium text-gray-900 group-hover:text-sig-blue transition truncate">
                                         {{ $article->title }}
-                                    </a>
+                                    </div>
                                     <div class="text-sm text-gray-500">{{ $article->created_at->format('M j, Y') }}</div>
+                                </a>
+
+                                <div class="flex items-center gap-3 shrink-0">
+                                    <span @class([
+                                        'inline-flex items-center gap-1.5 px-2 py-1 text-xs font-semibold rounded-full',
+                                        'bg-gray-200 text-gray-700' => $article->status === 'draft',
+                                        'bg-yellow-100 text-yellow-800' => $article->status === 'pending',
+                                        'bg-red-100 text-red-800' => $article->status === 'rejected',
+                                        'bg-green-100 text-green-800' => $article->status === 'published',
+                                    ])>
+                                        <span @class([
+                                            'w-1.5 h-1.5 rounded-full',
+                                            'bg-gray-500' => $article->status === 'draft',
+                                            'bg-yellow-500' => $article->status === 'pending',
+                                            'bg-red-500' => $article->status === 'rejected',
+                                            'bg-green-500' => $article->status === 'published',
+                                        ])></span>
+                                        {{ ucfirst($article->status) }}
+                                    </span>
+
+                                    @if (in_array($article->status, ['draft', 'rejected']))
+                                        <x-confirm-delete-modal
+                                            :id="'delete-article-'.$article->id"
+                                            :action="route('articles.destroy', $article)"
+                                            :title="__('Delete this article?')"
+                                            :body="__('This cannot be undone.')">
+                                            <span class="text-sm text-red-600 hover:text-red-800 transition">{{ __('Delete') }}</span>
+                                        </x-confirm-delete-modal>
+                                    @endif
                                 </div>
-                                <span @class([
-                                    'px-2 py-1 text-xs font-semibold rounded-full',
-                                    'bg-gray-200 text-gray-700' => $article->status === 'draft',
-                                    'bg-yellow-100 text-yellow-800' => $article->status === 'pending',
-                                    'bg-red-100 text-red-800' => $article->status === 'rejected',
-                                    'bg-green-100 text-green-800' => $article->status === 'published',
-                                ])>
-                                    {{ ucfirst($article->status) }}
-                                </span>
                             </li>
                         @endforeach
                     </ul>

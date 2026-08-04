@@ -8,19 +8,15 @@
     <div class="py-12">
         <div class="max-w-5xl mx-auto sm:px-6 lg:px-8 space-y-4">
             @if (session('status'))
-                <div class="p-4 bg-green-50 border border-green-200 rounded text-sm text-green-700">
-                    {{ session('status') }}
-                </div>
+                <x-flash-message>{{ session('status') }}</x-flash-message>
             @endif
 
             @if (session('error'))
-                <div class="p-4 bg-red-50 border border-red-200 rounded text-sm text-red-700">
-                    {{ session('error') }}
-                </div>
+                <x-flash-message type="error">{{ session('error') }}</x-flash-message>
             @endif
 
             @forelse ($pending as $article)
-                <div class="bg-white shadow-sm sm:rounded-lg p-6">
+                <div class="bg-white shadow-sm sm:rounded-lg p-6 transition hover:shadow-md">
                     <div class="flex justify-between items-start gap-6">
                         <div class="flex-1">
                             <h3 class="text-lg font-semibold text-gray-900">{{ $article->title }}</h3>
@@ -53,7 +49,7 @@
 
                             <form method="POST" action="{{ route('admin.approvals.reject', $article) }}" class="space-y-2">
                                 @csrf
-                                <textarea name="rejection_reason" rows="2" placeholder="{{ __('Reason for rejection') }}" class="w-full text-sm border-gray-300 rounded-md" required></textarea>
+                                <textarea name="rejection_reason" rows="2" placeholder="{{ __('Reason for rejection') }}" class="w-full text-sm border-gray-300 rounded-md focus:border-sig-blue focus:ring-sig-blue" required></textarea>
                                 <x-danger-button class="w-full justify-center">{{ __('Reject') }}</x-danger-button>
                             </form>
                         </div>

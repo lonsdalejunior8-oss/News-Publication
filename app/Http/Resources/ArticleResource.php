@@ -35,6 +35,10 @@ class ArticleResource extends JsonResource
                 fn ($image) => $request->getSchemeAndHttpHost().$image->url()
             )),
             'published_at' => $this->published_at?->toIso8601String(),
+            'status' => $this->status,
+            'rejection_reason' => $this->rejection_reason,
+            'created_at' => $this->created_at?->toIso8601String(),
+            'updated_at' => $this->updated_at?->toIso8601String(),
         ];
     }
 }

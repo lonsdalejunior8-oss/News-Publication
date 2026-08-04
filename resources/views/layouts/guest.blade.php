@@ -15,10 +15,15 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans text-gray-900 antialiased">
+        <div class="h-1.5 flex">
+            <div class="flex-1 bg-sig-blue"></div>
+            <div class="flex-1 bg-sig-yellow"></div>
+            <div class="flex-1 bg-sig-green"></div>
+        </div>
         <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
             <div>
-                <a href="/">
-                    <x-application-logo class="w-20 h-20 fill-current text-gray-500" />
+                <a href="/" class="font-bold text-2xl text-sig-blue">
+                    {{ config('app.name') }}
                 </a>
             </div>
 

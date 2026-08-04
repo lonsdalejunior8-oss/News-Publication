@@ -14,6 +14,15 @@ export default {
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
             },
+            colors: {
+                // Solomon Islands national flag colors (blue / yellow / green)
+                sig: {
+                    blue: '#0051BA',
+                    'blue-dark': '#003C8A',
+                    yellow: '#FCD116',
+                    green: '#215B33',
+                },
+            },
         },
     },
 
